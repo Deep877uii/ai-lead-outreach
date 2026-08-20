@@ -70,8 +70,8 @@ export async function getLeads(): Promise<Lead[]> {
   return Array.isArray(payload.data) ? payload.data : [];
 }
 
-export async function runScraper(config: ScraperConfig) {
-  return request<{ success: boolean; message?: string; leadsProcessed?: number }>("/run-scraper", {
+export async function startScraper(config: ScraperConfig) {
+  return request<{ success: boolean; message?: string; leadsProcessed?: number }>("/start-scraper", {
     method: "POST",
     body: JSON.stringify(config),
   });

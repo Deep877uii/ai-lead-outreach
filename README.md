@@ -16,7 +16,8 @@ The API client is centralized in `client/src/lib/api.ts`. It communicates only w
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/run-scraper` | Starts the long-running lead discovery workflow. |
+| `POST` | `/start-scraper` | Preferred direct entry point for the long-running lead discovery workflow. |
+| `POST` | `/run-scraper` | Alternative entry point through the API workflow. |
 | `GET` | `/leads` | Loads the latest extracted leads. |
 | `POST` | `/generate-email` | Generates a personalized draft from the complete selected lead object. |
 | `POST` | `/send-email` | Sends the currently edited email after explicit confirmation. |
@@ -25,7 +26,7 @@ The default base URL is `https://deepashu.app.n8n.cloud/webhook`. The frontend d
 
 ## Workflow behavior
 
-The dashboard loads leads on entry and supports local search, email filtering, location filtering, sorting, detail review, and responsive mobile cards. Starting a scraper disables duplicate execution, communicates that the workflow may take time, waits for completion, then reloads leads. Email generation opens an editor only after a successful response. Recipient, subject, and body are editable; the recipient is validated before send. A mandatory confirmation dialog appears before `/send-email`, and only a successful response marks the lead as contacted and adds it to current-session sent history.
+The dashboard loads leads on entry and supports local search, email filtering, location filtering, sorting, detail review, and responsive mobile cards. Starting a scraper calls the preferred direct `/start-scraper` endpoint, disables duplicate execution, communicates that the workflow may take time, waits for completion, then reloads leads. Email generation opens an editor only after a successful response. Recipient, subject, and body are editable; the recipient is validated before send. A mandatory confirmation dialog appears before `/send-email`, and only a successful response marks the lead as contacted and adds it to current-session sent history.
 
 The Outreach and Sent pages intentionally use frontend session state only. They do not imply persistent database history.
 

@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Lead, GeneratedEmail, getLeads, runScraper, generateEmail, sendEmail } from "@/lib/api";
+import { Lead, GeneratedEmail, getLeads, startScraper, generateEmail, sendEmail } from "@/lib/api";
 
 type Page = "leads" | "outreach" | "sent";
 type SentRecord = { id: string; lead: Lead; recipient: string; subject: string; sentAt: string };
@@ -78,7 +78,7 @@ export default function Home({ initialPage = "leads" }: { initialPage?: Page }) 
     return matchesQuery && matchesEmail && matchesLocation;
   }).sort((a, b) => sort === "oldest" ? new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime() : sort === "name" ? a.name.localeCompare(b.name) : sort === "company" ? a.company.localeCompare(b.company) : new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()), [leads, query, emailFilter, locationFilter, sort]);
 
-  const beginScrape = async () => { setScraping(true); setScraperOpen(false); try { const result = await runScraper(scraperConfig); if (result.success) { toast.success(`${result.leadsProcessed || 0} leads processed`); await load(); } } catch (error) { toast.error(error instanceof Error ? error.message : "The scraping workflow is taking longer than expected. Please check the leads again shortly."); } finally { setScraping(false); } };
+  const beginScrape = async () => { setScraping(true); setScraperOpen(false); try { const result = await startScraper(scraperConfig); if (result.success) { toast.success(`${result.leadsProcessed || 0} leads processed`); await load(); } } catch (error) { toast.error(error instanceof Error ? error.message : "The scraping workflow is taking longer than expected. Please check the leads again shortly."); } finally { setScraping(false); } };
   const openGenerate = async (lead: Lead) => { if (generating) return; setComposerLead(lead); setComposerError(""); setGenerating(true); try { const result = await generateEmail(lead); if (!result.success) throw new Error("The email could not be generated. Please try again."); setDraft(result); setGenerated((current) => ({ ...current, [lead.leadId]: result })); } catch (error) { setComposerLead(null); toast.error(error instanceof Error ? error.message : "The email could not be generated."); } finally { setGenerating(false); } };
   const validateDraft = () => { if (!draft?.leadId || !draft.recipient || !emailPattern.test(draft.recipient) || !draft.subject.trim() || !draft.body.trim()) { setComposerError(!draft?.recipient ? "No email address was found for this lead. Enter a valid recipient before sending." : "Check the recipient, subject, and message before sending."); return false; } setComposerError(""); return true; };
   const confirmSend = () => { if (validateDraft()) setConfirmOpen(true); };
