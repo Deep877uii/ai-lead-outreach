@@ -10,7 +10,9 @@ import Home from "./pages/Home";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={() => <Home initialPage="leads" />} />
+      <Route path={"/outreach"} component={() => <Home initialPage="outreach" />} />
+      <Route path={"/sent"} component={() => <Home initialPage="sent" />} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
